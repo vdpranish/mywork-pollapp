@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block titile %}Polls Page{% endblock %}
+{% block content %}
+    <p>{{ perms.createuser }}</p>
+    {%   if perms %}
+        <div class="container mt-5">
+                            <div class="col-md-6 mx-auto bg-light rounded p-3">
+                                {% if lastest_question %}
+                                    <h3 class="h3 text-center m-2 ">Please Vote</h3>
+                                    <ul>
+                                        {% for question in lastest_question %}
+                                            <li><a href="{% url 'p:detail' question.id %}"  class="badge badge-danger p-2 m-1" >{{ question.question_text }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                            </div>
+                                {% else %}
+                                <p>No polls are available</p>
+                                {% endif %}
+        </div>
+    {% endif %}
+{% endblock %}

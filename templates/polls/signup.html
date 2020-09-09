@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% if request.user.is_authenticte %}
+    {% block title %} Update{% endblock %}
+    {% else %}
+{#    {% block title %} Sign up{% endblock %}#}
+{% endif %}
+{% block content %}
+    <div class="container mt-3 bg-light shadow rounded w-50">
+        <form method="POST"  enctype="multipart/form-data" class="p-4">
+            {% csrf_token %}
+  <!-- 2 column grid layout with text inputs for the first and last names -->
+          <div class="row mb-4">
+            <div class="col">
+              <div class="form-outline">
+                <label class="form-label" for="form3Example1">First name</label>
+                  {{ form.first_name }}
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-outline">
+                  <label class="form-label" for="form3Example2">Last name</label>
+                    {{ form.last_name }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Username input -->
+          <div class="form-outline mb-4">
+            <label class="form-label" for="form3Example3">Username</label>
+              {{ form.username }}
+          </div>
+
+          <!-- Check User or Admin -->
+            {% if request.user.userrole.role == 'admin' %}
+{#                <div class="form-outline mb-4">#}
+{#                    <label for="exampleFormControlSelect1">Select Role</label>#}
+{#                    {{ role_form.role }}#}
+{#                </div>#}
+            {% else %}
+                <div class="form-outline mb-4">
+                    <label class="form-label" for="form3Example4">Password</label>
+                        {{ form.password1 }}
+                </div>
+                <div class="form-outline mb-4">
+                    <label class="form-label" for="form3Example4">Profile Photo</label>
+                    {{ p_form.picture }}
+                </div>
+                <div class="form-outline mb-4">
+                    <label for="exampleFormControlSelect1">Select Role</label>
+                    {{ role_form.role }}
+                </div>
+            {% endif %}
+
+          <!-- Submit button -->
+            {% if request.user.userrole.role == 'admin' %}
+                <button type="submit" class="btn btn-danger btn-block mb-4">Update</button>
+                {% else %}
+                <button type="submit" class="btn btn-primary btn-block mb-4">Sign up</button>
+            {% endif %}
+        </form>
+    </div>
+{% endblock %}
