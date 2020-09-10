@@ -10,7 +10,7 @@
             {% for user in all_user %}
 
                 <div class="container mt-4">
-                <div class="media mt-1">
+                <div class="media mt-1" id="userprofile">
                 <div class="media-body">
                 <h3 class="mt-0 mb-1 ml-5">User info</h3>
                 <ul>
@@ -24,7 +24,9 @@
                 <img src="{{ user.userprofileimg.picture.url }}" class=" ml-3 rounded" alt="..." height="100" width="100">
                 </div>
                 <a href="{% url 'p:edit' user.id%}" class="btn-sm btn-primary ml-4 ">Edit</a>
-                <a href="{% url 'p:delete' user.id%}" class="btn-sm btn-danger  ">Delete</a>
+
+{#                    <a href="#" class="btn-sm btn-danger btn-delete" data-id={{ user.id }}>Delete</a>#}
+                <a href="{% url 'p:delete' user.id%}" class="btn-sm btn-danger btn-delete ">Delete</a>
                 </div>
                 <hr/>
             {% endfor %}

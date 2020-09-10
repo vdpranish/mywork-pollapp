@@ -7,10 +7,11 @@
 <div class="jumbotron">
   {%  if user_del %}
     <h1 class="display-4">Do You Want to Delete "{{user_del.username}}"</h1>
-        <form action="{% url 'p:delete' user_del.id %}" method="POST" class="mt-2">
-        {% csrf_token %}
-      <a  href="{% url 'p:login' %}" class="btn btn-primary">Cancel</a>
-      <button type="submit" class="btn btn-danger">Delete</button>
+      <p>{{ user_del.id }}</p>
+        <form  method="POST" class="mt-2">
+            {% csrf_token %}
+            <a  href="{% url 'p:login' %}" class="btn btn-primary">Cancel</a>
+            <button id="btn-del" type="button" class="btn btn-danger" data-id="{{ user_del.id }}" >Delete</button>
         </form>
     {% endif %}
 </div>

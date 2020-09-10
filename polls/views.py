@@ -11,6 +11,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 # from django.contrib.auth.hashers import check_password
 from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import ValidationError
+from django.http import JsonResponse
 
 
 class IndexView(LoginRequiredMixin, generic.ListView):
@@ -123,12 +124,11 @@ def user_logout(request):
 # for editing user from the app
 def edit(request, user_id):
     edit_user = User.objects.get(id=user_id)
+    # data = dict()
     # instance is used for displaying fields
     form = CreateUser(instance=edit_user, initial={'password1': edit_user.password})
-
     if request.method == 'POST':
-        form = CreateUser(request.POST, instance=edit_user,initial={'password1': edit_user.password})
-        print(request.method)
+        form = CreateUser(request.POST, instance=edit_user, initial={'password1': edit_user.password})
         if form.is_valid():
             print('form is valid')
             form.save()
@@ -139,12 +139,15 @@ def edit(request, user_id):
         # 'edit_user': edit_user,
         'form': form
     }
+    # data =
+    # return JsonResponse(edit_user)
     return render(request, 'polls/signup.html', context)
 
 
 # user deleting from the app
 def delete_user(request, user_id):
     user_del = User.objects.get(id=user_id)
+    print(user_del)
     if request.method == 'POST':
         user_del.delete()
         return redirect('p:adminview')
@@ -152,3 +155,4 @@ def delete_user(request, user_id):
         'user_del': user_del
     }
     return render(request, 'polls/delete.html', context)
+    # return JsonResponse(user_del)
