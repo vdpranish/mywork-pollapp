@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
+from .secrets import *
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,7 +20,7 @@ print(BASE_DIR)
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '6oni&3*fs=)pj#+_=l&%hzv+(rjk5278=in@o_!om@sde(b9+8'
+# SECRET_KEY = '6oni&3*fs=)pj#+_=l&%hzv+(rjk5278=in@o_!om@sde(b9+8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

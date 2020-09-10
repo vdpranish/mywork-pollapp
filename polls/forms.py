@@ -6,7 +6,8 @@ from .models import UserProfileImg, UserRole
 
 class CreateUser(UserCreationForm):
     password2 = None
-    password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), required=False)
+    password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}, render_value=True),
+                                required=False)
 
     class Meta:
         model = User
@@ -31,8 +32,8 @@ class LoginUser(forms.Form):
         username = self.cleaned_data.get('username')
 
         qs = User.objects.filter(username=username)
-        if not qs[0].password  in password_passed:
-            return  forms.ValidationError('incorrect Password ')
+        if not qs[0].password in password_passed:
+            return forms.ValidationError('incorrect Password ')
 
 
 class ProfileImgForm(forms.ModelForm):

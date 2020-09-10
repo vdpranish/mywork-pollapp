@@ -12,6 +12,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import ValidationError
 
+
 class IndexView(LoginRequiredMixin, generic.ListView):
     login_url = '/'
     template_name = 'polls/index.html'
@@ -123,10 +124,10 @@ def user_logout(request):
 def edit(request, user_id):
     edit_user = User.objects.get(id=user_id)
     # instance is used for displaying fields
-    form = CreateUser(instance=edit_user)
+    form = CreateUser(instance=edit_user, initial={'password1': edit_user.password})
 
     if request.method == 'POST':
-        form = CreateUser(request.POST, instance=edit_user)
+        form = CreateUser(request.POST, instance=edit_user,initial={'password1': edit_user.password})
         print(request.method)
         if form.is_valid():
             print('form is valid')
