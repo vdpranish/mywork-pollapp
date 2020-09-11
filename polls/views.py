@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from .models import Question, Choice
 from django.urls import reverse
 from django.views import generic
@@ -7,11 +7,7 @@ from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
 from .forms import CreateUser, LoginUser, ProfileImgForm, UserRoleForm
 from django.contrib.auth.models import User
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-# from django.contrib.auth.hashers import check_password
-from django.contrib.auth.decorators import permission_required
-from django.core.exceptions import ValidationError
-from django.http import JsonResponse
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class IndexView(LoginRequiredMixin, generic.ListView):
@@ -48,7 +44,7 @@ def vote(request, question_id):
         selected_choice = question.choice_set.get(pk=request.POST['choice'])
     except (KeyError, Choice.DoesNotExist):
         context = {'question': question, 'error_msg': "You didn't selected the choice"}
-        return render(request, 'polls.detail.html', context)
+        return render(request, 'polls/detail.html', context)
     else:
         selected_choice.vote += 1
         selected_choice.save()
@@ -124,7 +120,6 @@ def user_logout(request):
 # for editing user from the app
 def edit(request, user_id):
     edit_user = User.objects.get(id=user_id)
-    # data = dict()
     # instance is used for displaying fields
     form = CreateUser(instance=edit_user, initial={'password1': edit_user.password})
     if request.method == 'POST':
@@ -136,7 +131,7 @@ def edit(request, user_id):
         else:
             print('Nothing updated')
     context = {
-        # 'edit_user': edit_user,
+        'edit_user': edit_user,
         'form': form
     }
     # data =
