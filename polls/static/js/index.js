@@ -54,6 +54,7 @@ $(".btn-delete").click(
                 return cookieValue;
             }
             const csrftoken = getCookie('csrftoken');
+            console.log(csrftoken)
         // ajax request for deleting user
         $.ajax(
             {
@@ -62,20 +63,11 @@ $(".btn-delete").click(
             headers: {'X-CSRFToken': csrftoken},
             contentType: "application/json; charset=utf-8",
             dataType: "json",
-            success: window.location.href = "/adminview",
+            success: window.location.href = "/table"
             });
         })
     }
 )
-
-
-
-
-
-
-
-
-
 
 
 // updating the user
@@ -91,7 +83,7 @@ $('#update-btn').click(
             headers: {'X-CSRFToken': csrftoken},
             contentType: "application/json; charset=utf-8",
             dataType: "json",
-            success: window.location.href = "/adminview"
+            success: window.location.href = `${userId}/edit`
         });
         console.log('Success')
     }

@@ -89,7 +89,7 @@ def user_login(request):
     if user is not None:
         if user_1.userrole.role == 'admin':
             login(request, user)
-            return redirect('p:adminview')
+            return redirect('p:table')
         elif user_1.userrole.role == 'user':
             print(p)
             print(f'{user} inside user')
@@ -101,14 +101,22 @@ def user_login(request):
     return render(request, 'polls/login.html', context)
 
 
-class AdminView(LoginRequiredMixin, generic.ListView):
+class AdminView(LoginRequiredMixin, generic.DetailView):
+    model = User
     login_url = '/'
     template_name = 'polls/admin.html'
+
+    def get_queryset(self):
+        return User.objects.all()
+
+
+class TableView(generic.ListView):
+    template_name = 'polls/table.html'
     context_object_name = 'all_user'
 
     # fetching all user from database except admin user
     def get_queryset(self):
-        return [user for user in User.objects.all() if user.userrole.role == 'user']
+        return [u for u in User.objects.all()]
 
 
 # for logout user from the app
@@ -127,7 +135,7 @@ def edit(request, user_id):
         if form.is_valid():
             print('form is valid')
             form.save()
-            return redirect('p:adminview')
+            return redirect('p:adminview', pk=user_id)
         else:
             print('Nothing updated')
     context = {
@@ -145,7 +153,7 @@ def delete_user(request, user_id):
     print(user_del)
     if request.method == 'POST':
         user_del.delete()
-        return redirect('p:adminview')
+        return redirect('p:adminview', pk=user_id)
     context = {
         'user_del': user_del
     }

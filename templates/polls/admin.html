@@ -7,28 +7,36 @@
    {% if request.user.userrole == 'user' %}
         <p>You Have no Permission to view this page</p>
     {% else %}
-       {% if all_user %}
-           {% for user in all_user %}
+       {{ object }}
+       {% if object %}
+{#           {% for u in user_all %}#}
 
                 <div class="container mt-4 user-info">
                 <div class="media mt-1" id="userprofile">
                 <div class="media-body">
                 <h3 class="mt-0 mb-1 ml-5">User info</h3>
                 <ul>
-                    <li class="mt-1">First name:{{ user.first_name }}</li>
-                    <li class="mt-1">Last name:{{ user.last_name }}</li>
-                    <li class="mt-1">Username:{{ user.username }}</li>
+                    <li class="mt-1">First name:{{ object.first_name }}</li>
+                    <li class="mt-1">Last name:{{ object.last_name }}</li>
+                    <li class="mt-1">Username:{{ object.username }}</li>
                 </ul>
                 </div>
-                <img src="{{ user.userprofileimg.picture.url }}" class=" ml-3 rounded" alt="..." height="100" width="100">
+                <img src="{{ object.userprofileimg.picture.url }}" class=" ml-3 rounded" alt="..." height="100" width="100">
                 </div>
-                    <a href="{% url 'p:edit' user.id%}" class="btn-sm btn-primary ml-4 ">Edit</a>
-                    <button type="submit" class="btn-sm btn-danger btn-delete" data-id={{user.id}} data-name={{ user.username }} data-toggle="modal" data-target="#exampleModal">Delete</button>
+                    <a href="{% url 'p:edit' object.id%}" class="btn-sm btn-primary ml-4 ">Edit</a>
+                    <button type="submit" class="btn-sm btn-danger btn-delete" data-id={{object.id}} data-name={{ object.username }} data-toggle="modal" data-target="#exampleModal">Delete</button>
                 </div>
                 <hr/>
-            {% endfor %}
+{#            {% endfor %}#}
             {% else %}
            <p>No users found</p>
            {% endif %}
    {% endif %}
+    {% if request.user.userrole.role == 'admin' %}
+        {% block table %}
+            {% include 'polls/table.html' %}
+        {% endblock %}
+    {% endif %}
+
 {% endblock %}
+

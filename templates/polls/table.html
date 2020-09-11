@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        {% if all_user %}
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">First</th>
+              <th scope="col">Last</th>
+              <th scope="col">Handle</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in all_user %}
+                {% if user.userrole.role == 'user' %}
+                    <tr>
+                      <th scope="row">1</th>
+                      <td>{{ user.first_name }}</td>
+                      <td>{{ user.last_name }}</td>
+                      <td><a href="{% url 'p:adminview'  user.id %}">{{ user.username }}</a></td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+          </tbody>
+    </table>
+    {% else %}
+            <h1>No User Found,Please Add User</h1>
+    {% endif %}
+    </div>
+{% endblock %}
