@@ -13,5 +13,6 @@ urlpatterns = [
     path('table/', views.TableView.as_view(), name='table'),
     path('', views.user_login, name='login'),
     path('<int:user_id>/edit/', views.edit, name='edit'),
-    path('<int:user_id>/delete/', views.delete_user, name='delete')
+    path('delete/', views.delete_user, name='delete'),
+    path('ajaxaction/', views.ajax_request, name='ajaxaction'),
 ]

@@ -15,7 +15,7 @@ class CreateUser(UserCreationForm):
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'username': forms.TextInput(attrs={'class': 'form-control', 'required': False}),
             # 'email':forms.CharField(widget=forms.EmailInput(attrs={'class':'form-control'}))
             # 'password1': forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from .models import Question, Choice
 from django.urls import reverse
 from django.views import generic
@@ -8,6 +8,9 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import CreateUser, LoginUser, ProfileImgForm, UserRoleForm
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+import json
 
 
 class IndexView(LoginRequiredMixin, generic.ListView):
@@ -91,9 +94,6 @@ def user_login(request):
             login(request, user)
             return redirect('p:table')
         elif user_1.userrole.role == 'user':
-            print(p)
-            print(f'{user} inside user')
-            print(user_1.userrole.role)
             login(request, user)
             return redirect('p:index')
     form = LoginUser()
@@ -116,7 +116,7 @@ class TableView(generic.ListView):
 
     # fetching all user from database except admin user
     def get_queryset(self):
-        return [u for u in User.objects.all()]
+        return [user for user in User.objects.all()]
 
 
 # for logout user from the app
@@ -142,8 +142,6 @@ def edit(request, user_id):
         'edit_user': edit_user,
         'form': form
     }
-    # data =
-    # return JsonResponse(edit_user)
     return render(request, 'polls/signup.html', context)
 
 
@@ -159,3 +157,27 @@ def delete_user(request, user_id):
     }
     return render(request, 'polls/delete.html', context)
     # return JsonResponse(user_del)
+
+
+# class AjaxRequest(generic.View):
+def ajax_request(request):
+    user_id = request.POST.get('id')
+    action = request.POST.get('action')
+    print(request.POST)
+    data = dict()
+    if action == "DELETE":
+        qs = User.objects.get(id=user_id)
+        qs.delete()
+        data['html_view'] = render_to_string('polls/table.html')
+        return JsonResponse(data)
+    elif action == "EDIT":
+        edit_user = User.objects.get(id=user_id)
+        if request.method == "POST":
+            form = CreateUser(request.POST, instance=edit_user,
+                              initial={'password1': edit_user.password, 'username': edit_user.username})
+            print(form.errors.as_data())
+            if form.is_valid():
+                form.save()
+                data['html_view'] = render_to_string('polls/table.html')
+                return HttpResponse(json.dumps(data), content_type="application/json")
+                # return  JsonResponse(data,status=200)

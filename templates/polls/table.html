@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{#{% extends 'base.html' %}#}
 
 {% block content %}
     <div class="container">
@@ -13,13 +13,23 @@
             </tr>
           </thead>
           <tbody>
-            {% for user in all_user %}
-                {% if user.userrole.role == 'user' %}
+            {% for object in all_user %}
+                {% if object.userrole.role == 'user' %}
                     <tr>
                       <th scope="row">1</th>
-                      <td>{{ user.first_name }}</td>
-                      <td>{{ user.last_name }}</td>
-                      <td><a href="{% url 'p:adminview'  user.id %}">{{ user.username }}</a></td>
+                      <td>{{ object.first_name }}</td>
+                      <td>{{ object.last_name }}</td>
+                      <td>
+                          <a href="{% url 'p:adminview'  object.id %}">{{ object.username }}</a>
+                          <span class="dropdown">
+                              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              </button>
+                              <span class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                  {% csrf_token %}
+                                  <button type="button"  id="btn-delete" class="dropdown-item" data-id={{object.id}} data-name={{ object.username }} data-toggle="modal" data-target="#exampleModal" data-url="{% url 'p:ajaxaction'%}">Delete</button>
+                              </span>
+                          </span>
+                      </td>
                     </tr>
                 {% endif %}
             {% endfor %}

@@ -1,92 +1,60 @@
-// creating an html element
-const  modal = document.createElement("div");
 
 
-$(".btn-delete").click(
-    function (){
-        const userId = $(this).attr("data-id")
-        const userName = $(this).attr("data-name")
-        // adding modal into created element
-        modal.innerHTML = `
-            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Delete Confirmation</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                      </div>
-                      <div class="modal-body">
-                        <p>Please Confirm for Delete ${userName}</p>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button id="del-confirm" type="submit" class="btn btn-primary" data-id=${userId}>Delete</button>
-                      </div>
-                    </div>
-                  </div>
-            </div>
-`
-        console.log(userId)
-        console.log(userName)
 
-        // modal appdending
+$(document).ready(function (){
+    deleteUser()
+})
 
-        document.querySelector(".user-info").appendChild(modal);
-        $("#del-confirm").click(function(){
-          const useId = $(this).attr("data-id");
-        console.log(useId)
-            // creating csrf token
-        function getCookie(name) {
-                let cookieValue = null;
-                if (document.cookie && document.cookie !== '') {
-                    const cookies = document.cookie.split(';');
-                    for (let i = 0; i < cookies.length; i++) {
-                        const cookie = cookies[i].trim();
-                        // Does this cookie string begin with the name we want?
-                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
-                        }
-                    }
-                }
-                return cookieValue;
+function  deleteUser(){
+    $('#btn-delete').click(function (){
+    $.ajax({
+        type:"POST",
+        dataType:'json',
+        beforeSend: function (){
+            $('#exampleModal').modal("show")
             }
-            const csrftoken = getCookie('csrftoken');
-            console.log(csrftoken)
-        // ajax request for deleting user
-        $.ajax(
-            {
-            type:"POST",
-            url: "/"+useId+"/delete/",
-            headers: {'X-CSRFToken': csrftoken},
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: window.location.href = "/table"
-            });
         })
-    }
-)
+    })
+ }
+
+$("#modal-submit").on('click',function (){
+    let csrfToken = $('input[name=csrfmiddlewaretoken]').val()
+    const userId = $(this).data('id')
+        $.ajax({
+        url:$('#modal-submit').data('url'),
+        type:"POST",
+        data: {
+            csrfmiddlewaretoken: csrfToken,
+            id:userId,
+            action:"DELETE"
+        },
+        dataType:'json',
+        success:function (data){
+            $('.user-info').html(data.html_view)
+            $('#exampleModal').modal("hide")
+            }
+        })
+    })
 
 
 // updating the user
-$('#update-btn').click(
-    function (){
-        const  userId = $(this).attr("data-id");
-        let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        console.log('Clicked')
-        console.log(`user id :${userId}`)
+$('#update-btn').click(function (){
+        let csrfToken = $('input[name=csrfmiddlewaretoken]').val()
+        const  userId = $(this).data('id')
+        console.log(userId)
+        console.log(csrfToken)
         $.ajax({
+            url: $('#update-btn').data("url"),
             type:"POST",
-            url: "/"+userId+"/edit/",
-            headers: {'X-CSRFToken': csrftoken},
-            contentType: "application/json; charset=utf-8",
+            data: {
+                csrfmiddlewaretoken: csrfToken,
+                id:userId,
+                action:"EDIT"
+            },
             dataType: "json",
-            success: window.location.href = `${userId}/edit`
+            success: function (data){
+                $('#signup-form').html(data.html_view)
+            }
         });
-        console.log('Success')
     }
     )
-
-
