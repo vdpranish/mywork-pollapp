@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-5 bg-info w-50 rounded">
+        <form method="POST" enctype="multipart/form-data" class="p-5">
+            <h2>PDF Upload</h2>
+                {% csrf_token %}
+                {{ form.as_p }}
+            <a href="{{ qs.pdf_file.url }}" class="btn btn-danger btn-sm">Check PDF</a>
+            <button class="btn btn-primary btn-sm" type="submit">Upload</button>
+        </form>
+    </div>
+{% endblock %}

@@ -7,8 +7,8 @@
 {#    {% block title %} Sign up{% endblock %}#}
 {% endif %}
 {% block content %}
-    <div class="container mt-3 bg-light shadow rounded w-50 signup-form">
-        <form method="POST"  enctype="multipart/form-data" class="p-4">
+    <div class="container mt-3 bg-light shadow rounded w-50 ">
+        <form method="POST"  id="signup-form" enctype="multipart/form-data" class="polls-4">
             {% csrf_token %}
   <!-- 2 column grid layout with text inputs for the first and last names -->
           <div class="row mb-4">
@@ -55,7 +55,7 @@
 
           <!-- Submit button -->
             {% if request.user.userrole.role == 'admin' %}
-                <button id="update-btn" type="button" class="btn btn-danger btn-block mb-4" data-id={{ edit_user.id }} data-url="{% url 'p:ajaxaction'%}">Update</button>
+                <button id="update-btn" type="button" class="btn btn-danger btn-block " data-url="{% url 'polls:ajaxaction' %}" data-id={{ edit_user.id }} data-username={{ edit_user.username }} data-firstname={{ edit_user.first_name }} data-lastname={{ edit_user.last_name }} >Update</button>
                 {% else %}
                 <button type="submit" class="btn btn-primary btn-block mb-4">Sign up</button>
             {% endif %}

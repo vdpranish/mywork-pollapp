@@ -1,11 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseRedirect, HttpResponse
-from .models import Question, Choice
+from .models import Question, Choice, UploadPdf
 from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
-from .forms import CreateUser, LoginUser, ProfileImgForm, UserRoleForm
+from .forms import CreateUser, LoginUser, ProfileImgForm, UserRoleForm, EditForm, PdfFileUpload
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
@@ -51,7 +51,7 @@ def vote(request, question_id):
     else:
         selected_choice.vote += 1
         selected_choice.save()
-        return HttpResponseRedirect(reverse('p:results', args=(question.id,)))
+        return HttpResponseRedirect(reverse('polls:results', args=question.id))
 
 
 def signup(request):
@@ -85,17 +85,14 @@ def user_login(request):
     username = request.POST.get('username')
     password = request.POST.get('password')
     user_1 = User.objects.filter(username=username).first()
-    p = User.objects.filter(username='pranish1').first()
     user = authenticate(request, username=username, password=password)
-    print(user_1)
-    # print(f'{user} under user')
     if user is not None:
         if user_1.userrole.role == 'admin':
             login(request, user)
-            return redirect('p:table')
+            return redirect('polls:table')
         elif user_1.userrole.role == 'user':
             login(request, user)
-            return redirect('p:index')
+            return redirect('polls:index')
     form = LoginUser()
     context = {'form': form}
     return render(request, 'polls/login.html', context)
@@ -122,22 +119,24 @@ class TableView(generic.ListView):
 # for logout user from the app
 def user_logout(request):
     logout(request)
-    return redirect('p:login')
+    return redirect('polls:login')
 
 
 # for editing user from the app
 def edit(request, user_id):
     edit_user = User.objects.get(id=user_id)
     # instance is used for displaying fields
-    form = CreateUser(instance=edit_user, initial={'password1': edit_user.password})
-    if request.method == 'POST':
-        form = CreateUser(request.POST, instance=edit_user, initial={'password1': edit_user.password})
-        if form.is_valid():
-            print('form is valid')
-            form.save()
-            return redirect('p:adminview', pk=user_id)
-        else:
-            print('Nothing updated')
+    form = EditForm(initial={'password1': edit_user.password, 'username': edit_user.username,
+                             'first_name': edit_user.first_name, 'last_name': edit_user.last_name})
+    # if request.method == 'POST':
+    #     form = EditForm(request.POST, initial={'password1': edit_user.password, 'username': edit_user.username,
+    #                                            'first_name': edit_user.first_name, 'last_name': edit_user.last_name})
+    #     if form.is_valid():
+    #         print('form is valid')
+    #         form.save()
+    #         return redirect('polls:adminview', pk=user_id)
+    #     else:
+    #         print('Nothing updated')
     context = {
         'edit_user': edit_user,
         'form': form
@@ -151,7 +150,7 @@ def delete_user(request, user_id):
     print(user_del)
     if request.method == 'POST':
         user_del.delete()
-        return redirect('p:adminview', pk=user_id)
+        return redirect('polls:adminview', pk=user_id)
     context = {
         'user_del': user_del
     }
@@ -163,21 +162,46 @@ def delete_user(request, user_id):
 def ajax_request(request):
     user_id = request.POST.get('id')
     action = request.POST.get('action')
-    print(request.POST)
+    form_value = request.POST.get('formData')
     data = dict()
     if action == "DELETE":
         qs = User.objects.get(id=user_id)
         qs.delete()
-        data['html_view'] = render_to_string('polls/table.html')
+        all_user = User.objects.all()
+        data['html_view'] = render_to_string('polls/table.html', {'all_user': all_user})
         return JsonResponse(data)
     elif action == "EDIT":
         edit_user = User.objects.get(id=user_id)
         if request.method == "POST":
-            form = CreateUser(request.POST, instance=edit_user,
-                              initial={'password1': edit_user.password, 'username': edit_user.username})
-            print(form.errors.as_data())
+            form = EditForm(request.POST,
+                            initial={'password1': edit_user.password, 'username': edit_user.username,
+                                     'first_name': edit_user.first_name, 'last_name': edit_user.last_name})
             if form.is_valid():
-                form.save()
-                data['html_view'] = render_to_string('polls/table.html')
+                json_for = json.loads(form_value)
+                first_name = json_for[1]['value']
+                last_name = json_for[2]['value']
+                username = json_for[3]['value']
+                edit_user.first_name = first_name
+                edit_user.last_name = last_name
+                edit_user.username = username
+                print(edit_user)
+                edit_user.save()
+                all_user = User.objects.all()
+                data['table_view'] = render_to_string('polls/table.html', {'all_user': all_user})
                 return HttpResponse(json.dumps(data), content_type="application/json")
-                # return  JsonResponse(data,status=200)
+                # return JsonResponse(data, status=200)
+
+
+def pdf_file(request):
+    if request.method == 'POST':
+        form = PdfFileUpload(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('polls:pdf')
+    else:
+        form = PdfFileUpload()
+        qs = UploadPdf.objects.all().first()
+        return render(request, 'polls/pdf_view.html', {
+            'form': form,
+            'qs': qs
+        })

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Question, Choice, UserProfileImg, UserRole
+from .models import Question, Choice, UserProfileImg, UserRole,UploadPdf
 
 
 # Register your models here.
@@ -26,3 +26,4 @@ class QuestionAdmin(admin.ModelAdmin):
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(UserProfileImg)
 admin.site.register(UserRole)
+admin.site.register(UploadPdf)

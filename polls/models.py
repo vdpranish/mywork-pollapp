@@ -45,7 +45,15 @@ class UserRole(models.Model):
         (USER, 'USER'),
         (ADMIN, 'ADMIN')
     ]
-    role = models.CharField(max_length=5, choices=user_option, default=USER, blank=True)
+    role = models.CharField(max_length=5, choices=user_option, default=USER, blank=True,null=True)
 
     def __str__(self):
         return f'{self.user.username} Role'
+
+
+class UploadPdf(models.Model):
+    pdf_name = models.CharField(max_length=100, blank=True)
+    pdf_file = models.FileField(upload_to='pdf')
+
+    def __str__(self):
+        return self.pdf_name

@@ -8,8 +8,6 @@
         <p>You Have no Permission to view this page</p>
     {% else %}
        {% if object %}
-{#           {% for u in user_all %}#}
-
                 <div class="container mt-4 user-info">
                 <div class="media mt-1" id="userprofile">
                 <div class="media-body">
@@ -20,14 +18,13 @@
                     <li class="mt-1">Username:{{ object.username }}</li>
                 </ul>
                 </div>
-                <img src="{{ object.userprofileimg.picture.url }}" class=" ml-3 rounded" alt="..." height="100" width="100">
+                <img src="{{ object.userprofileimg.picture.url }}" class=" ml-3 rounded" alt="{{ object.userprofileimg.picture.url }}" height="100" width="100">
                 </div>
                     {% csrf_token %}
-                    <a href="{% url 'p:edit' object.id%}" class="btn-sm btn-primary ml-4 ">Edit</a>
+                    <a href="{% url 'polls:edit' object.id%}" class="btn-sm btn-primary ml-4 ">Edit</a>
                     <button type="button"  id="btn-delete" class="btn-sm btn-danger" >Delete</button>
                 </div>
                 <hr/>
-{#            {% endfor %}#}
             {% else %}
            <p>No users found</p>
            {% endif %}
@@ -47,7 +44,7 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="modal-submit" data-id={{object.id}} data-name={{ object.username }}  data-url="{% url 'p:ajaxaction'%}">Save changes</button>
+                <button type="button" class="btn btn-primary" id="modal-submit" data-id={{object.id}} data-name={{ object.username }}  data-url="{% url 'polls:ajaxaction'%}">Save changes</button>
               </div>
             </div>
           </div>

@@ -41,19 +41,22 @@ $("#modal-submit").on('click',function (){
 $('#update-btn').click(function (){
         let csrfToken = $('input[name=csrfmiddlewaretoken]').val()
         const  userId = $(this).data('id')
-        console.log(userId)
-        console.log(csrfToken)
+        const formData = $('#signup-form').serializeArray();
+        const  formAll = JSON.stringify(formData)
+        const url = $(this).data("url")
+        console.log(url)
         $.ajax({
-            url: $('#update-btn').data("url"),
+            url: $(this).data("url"),
             type:"POST",
             data: {
                 csrfmiddlewaretoken: csrfToken,
                 id:userId,
-                action:"EDIT"
+                action:"EDIT",
+                formData:formAll,
             },
             dataType: "json",
             success: function (data){
-                $('#signup-form').html(data.html_view)
+                $('#signup-form').html(data.table_view)
             }
         });
     }

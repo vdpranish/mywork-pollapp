@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import UserProfileImg, UserRole
+from .models import UserProfileImg, UserRole, UploadPdf
 
 
 class CreateUser(UserCreationForm):
@@ -20,6 +20,13 @@ class CreateUser(UserCreationForm):
             # 'password1': forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
         }
+
+
+class EditForm(forms.Form):
+    first_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}),
+                                 required=False)
+    last_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
+    username = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
 
 
 # login form
@@ -49,4 +56,13 @@ class UserRoleForm(forms.ModelForm):
         widgets = {
             'role': forms.Select(attrs={'class': 'form-control'})
 
+        }
+
+
+class PdfFileUpload(forms.ModelForm):
+    class Meta:
+        model = UploadPdf
+        fields = ['pdf_name','pdf_file']
+        widgets = {
+            'pdf_name': forms.TextInput(attrs={'class': 'form-control'})
         }

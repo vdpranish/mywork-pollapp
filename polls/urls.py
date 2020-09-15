@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 
-app_name = 'p'
+app_name = 'polls'
 urlpatterns = [
     path('polls/', views.IndexView.as_view(), name='index'),
     path('<int:pk>/', views.DetailView.as_view(), name='detail'),
@@ -15,4 +15,5 @@ urlpatterns = [
     path('<int:user_id>/edit/', views.edit, name='edit'),
     path('delete/', views.delete_user, name='delete'),
     path('ajaxaction/', views.ajax_request, name='ajaxaction'),
+    path('pdf/', views.pdf_file, name='pdf'),
 ]
