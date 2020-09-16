@@ -1,16 +1,18 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponseRedirect, HttpResponse
-from .models import Question, Choice, UploadPdf
-from django.urls import reverse
-from django.views import generic
-from django.utils import timezone
-from django.contrib.auth import authenticate, login, logout
-from .forms import CreateUser, LoginUser, ProfileImgForm, UserRoleForm, EditForm, PdfFileUpload
-from django.contrib.auth.models import User
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse
-from django.template.loader import render_to_string
 import json
+import PyPDF2, os
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect, HttpResponse
+from django.http import JsonResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.template.loader import render_to_string
+from django.urls import reverse
+from django.utils import timezone
+from django.views import generic
+
+from .forms import CreateUser, LoginUser, ProfileImgForm, UserRoleForm, EditForm, PdfFileUpload
+from .models import Question, Choice, UploadPdf
 
 
 class IndexView(LoginRequiredMixin, generic.ListView):
@@ -128,15 +130,6 @@ def edit(request, user_id):
     # instance is used for displaying fields
     form = EditForm(initial={'password1': edit_user.password, 'username': edit_user.username,
                              'first_name': edit_user.first_name, 'last_name': edit_user.last_name})
-    # if request.method == 'POST':
-    #     form = EditForm(request.POST, initial={'password1': edit_user.password, 'username': edit_user.username,
-    #                                            'first_name': edit_user.first_name, 'last_name': edit_user.last_name})
-    #     if form.is_valid():
-    #         print('form is valid')
-    #         form.save()
-    #         return redirect('polls:adminview', pk=user_id)
-    #     else:
-    #         print('Nothing updated')
     context = {
         'edit_user': edit_user,
         'form': form
@@ -164,32 +157,32 @@ def ajax_request(request):
     action = request.POST.get('action')
     form_value = request.POST.get('formData')
     data = dict()
-    if action == "DELETE":
-        qs = User.objects.get(id=user_id)
-        qs.delete()
-        all_user = User.objects.all()
-        data['html_view'] = render_to_string('polls/table.html', {'all_user': all_user})
-        return JsonResponse(data)
-    elif action == "EDIT":
-        edit_user = User.objects.get(id=user_id)
-        if request.method == "POST":
-            form = EditForm(request.POST,
-                            initial={'password1': edit_user.password, 'username': edit_user.username,
-                                     'first_name': edit_user.first_name, 'last_name': edit_user.last_name})
-            if form.is_valid():
-                json_for = json.loads(form_value)
-                first_name = json_for[1]['value']
-                last_name = json_for[2]['value']
-                username = json_for[3]['value']
-                edit_user.first_name = first_name
-                edit_user.last_name = last_name
-                edit_user.username = username
-                print(edit_user)
-                edit_user.save()
-                all_user = User.objects.all()
-                data['table_view'] = render_to_string('polls/table.html', {'all_user': all_user})
-                return HttpResponse(json.dumps(data), content_type="application/json")
-                # return JsonResponse(data, status=200)
+    if request.is_ajax():
+        if action == "DELETE":
+            qs = User.objects.get(id=user_id)
+            qs.delete()
+            all_user = User.objects.all()
+            data['html_view'] = render_to_string('polls/table.html', {'all_user': all_user})
+            return JsonResponse(data)
+        elif action == "EDIT":
+            edit_user = User.objects.get(id=user_id)
+            if request.method == "POST":
+                form = EditForm(request.POST,
+                                initial={'password1': edit_user.password, 'username': edit_user.username,
+                                         'first_name': edit_user.first_name, 'last_name': edit_user.last_name})
+                if form.is_valid():
+                    json_for = json.loads(form_value)
+                    first_name = json_for[1]['value']
+                    last_name = json_for[2]['value']
+                    username = json_for[3]['value']
+                    edit_user.first_name = first_name
+                    edit_user.last_name = last_name
+                    edit_user.username = username
+                    edit_user.save()
+                    all_user = User.objects.all()
+                    data['table_view'] = render_to_string('polls/table.html', {'all_user': all_user})
+                    return HttpResponse(json.dumps(data), content_type="application/json")
+
 
 
 def pdf_file(request):
@@ -200,8 +193,22 @@ def pdf_file(request):
             return redirect('polls:pdf')
     else:
         form = PdfFileUpload()
-        qs = UploadPdf.objects.all().first()
-        return render(request, 'polls/pdf_view.html', {
+        qs = UploadPdf.objects.all()
+        context = {
             'form': form,
             'qs': qs
-        })
+        }
+        return render(request, 'polls/pdf_view.html', context)
+
+
+def pdf_view(request, pdf_id):
+    qs = UploadPdf.objects.get(id=pdf_id)
+    media_path = os.path.abspath('.')
+    pdf_open = open(media_path + qs.pdf_file.url, 'rb')
+    pdf_reader = PyPDF2.PdfFileReader(pdf_open)
+    pdf_pages = pdf_reader.numPages
+    pdf_html = [pdf_reader.getPage(pdf).extractText() for pdf in range(pdf_pages)]
+    pdf_text_file = print('file exit') if not media_path + f'/media/{qs.pdf_name}.txt' else open(media_path + f'/media/{qs.pdf_name}.txt', 'x')
+    [pdf_text_file.writelines(str(pdf)) for pdf in pdf_html]
+    pdf_text_file.close()
+    return render(request, 'polls/pdftext.html', {'pdf_html': pdf_html})

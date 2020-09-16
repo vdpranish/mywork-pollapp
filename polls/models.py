@@ -53,7 +53,8 @@ class UserRole(models.Model):
 
 class UploadPdf(models.Model):
     pdf_name = models.CharField(max_length=100, blank=True)
-    pdf_file = models.FileField(upload_to='pdf')
+    pdf_file = models.FileField(upload_to='pdf',blank=True,null=True)
+    zip_file = models.FileField(upload_to='zip_file',blank=True,null=True)
 
     def __str__(self):
         return self.pdf_name

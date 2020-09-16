@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <div class="container mt-5">
+        {% if pdf_html %}
+            {% for pdf in pdf_html %}
+                <p>{{ pdf }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock %}

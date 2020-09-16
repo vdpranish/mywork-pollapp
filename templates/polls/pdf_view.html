@@ -6,8 +6,29 @@
             <h2>PDF Upload</h2>
                 {% csrf_token %}
                 {{ form.as_p }}
-            <a href="{{ qs.pdf_file.url }}" class="btn btn-danger btn-sm">Check PDF</a>
             <button class="btn btn-primary btn-sm" type="submit">Upload</button>
         </form>
+    </div>
+    <div class="container mt-3 w-50">
+        <table class="table">
+            <thead>
+                <tr>
+                  <th scope="col">PDF Name</th>
+                  <th scope="col">View PDF</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for pdf in qs %}
+                <tr>
+                <td>
+                    {{ pdf.pdf_name }}
+                </td>
+                <td>
+                    <a href="{% url 'polls:pdfview' pdf.id %}" class="btn btn-danger btn-sm">Check PDF</a>
+                </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 {% endblock %}

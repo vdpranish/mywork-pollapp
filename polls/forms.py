@@ -62,7 +62,7 @@ class UserRoleForm(forms.ModelForm):
 class PdfFileUpload(forms.ModelForm):
     class Meta:
         model = UploadPdf
-        fields = ['pdf_name','pdf_file']
+        fields = ['pdf_name', 'pdf_file','zip_file']
         widgets = {
             'pdf_name': forms.TextInput(attrs={'class': 'form-control'})
         }
