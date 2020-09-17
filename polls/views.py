@@ -10,7 +10,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.views import generic
-
+from zipfile import ZipFile
 from .forms import CreateUser, LoginUser, ProfileImgForm, UserRoleForm, EditForm, PdfFileUpload
 from .models import Question, Choice, UploadPdf
 
@@ -184,7 +184,6 @@ def ajax_request(request):
                     return HttpResponse(json.dumps(data), content_type="application/json")
 
 
-
 def pdf_file(request):
     if request.method == 'POST':
         form = PdfFileUpload(request.POST, request.FILES)
@@ -203,12 +202,26 @@ def pdf_file(request):
 
 def pdf_view(request, pdf_id):
     qs = UploadPdf.objects.get(id=pdf_id)
+    zip_r = UploadPdf.objects.get(id=pdf_id)
     media_path = os.path.abspath('.')
-    pdf_open = open(media_path + qs.pdf_file.url, 'rb')
-    pdf_reader = PyPDF2.PdfFileReader(pdf_open)
-    pdf_pages = pdf_reader.numPages
-    pdf_html = [pdf_reader.getPage(pdf).extractText() for pdf in range(pdf_pages)]
-    pdf_text_file = print('file exit') if not media_path + f'/media/{qs.pdf_name}.txt' else open(media_path + f'/media/{qs.pdf_name}.txt', 'x')
-    [pdf_text_file.writelines(str(pdf)) for pdf in pdf_html]
-    pdf_text_file.close()
-    return render(request, 'polls/pdftext.html', {'pdf_html': pdf_html})
+    zip_location = media_path + zip_r.zip_file.url
+    with ZipFile(zip_location, 'r') as zip:
+        zip.extractall(path=f'{media_path}/extract/')
+    extracted_dir = media_path + '/extract/'
+    all_extracted_pdfs = (os.listdir(extracted_dir))
+    print(all_extracted_pdfs)
+    for file in all_extracted_pdfs:
+        print(file)
+        pdf_file_name = file
+        text_file_name = file[:-4]
+        pdf_open = open(extracted_dir + pdf_file_name, 'rb')
+        pdf_reader = PyPDF2.PdfFileReader(pdf_open)
+        pdf_pages = pdf_reader.numPages
+        pdf_html = [pdf_reader.getPage(pdf).extractText() for pdf in range(pdf_pages)]
+        pdf_text_file = open(media_path + f'/media/{text_file_name}.txt', 'x')
+        [pdf_text_file.writelines(str(pdf)) for pdf in pdf_html]
+        pdf_text_file.close()
+    return render(request, 'polls/pdftext.html')
+
+# if not media_path + f'/media/{qs.pdf_name}.txt' else os.remove(
+#              media_path + f'/media/{qs.pdf_name}.txt')
