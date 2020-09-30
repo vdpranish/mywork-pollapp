@@ -25,6 +25,10 @@ class IndexView(LoginRequiredMixin, generic.ListView):
         return Question.objects.filter(pub_date__lte=timezone.now()).order_by('-pub_date')[:5]
 
 
+class CalenderView(generic.TemplateView):
+    template_name = 'polls/calender.html'
+
+
 class DetailView(generic.DetailView):
     model = Question
     template_name = 'polls/detail.html'
@@ -100,13 +104,21 @@ def user_login(request):
     return render(request, 'polls/login.html', context)
 
 
-class AdminView(LoginRequiredMixin, generic.DetailView):
+# mixinins for adminview
+class UserGetMixin:
     model = User
-    login_url = '/'
-    template_name = 'polls/admin.html'
 
     def get_queryset(self):
         return User.objects.all()
+
+
+class AdminView(UserGetMixin, LoginRequiredMixin, generic.DetailView):
+    # model = User
+    login_url = '/'
+    template_name = 'polls/admin.html'
+
+    # def get_queryset(self):
+    #     return User.objects.all()
 
 
 class TableView(generic.ListView):

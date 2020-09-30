@@ -2,6 +2,7 @@ from django.db import models
 import datetime
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
 
 
 class Question(models.Model):
@@ -45,7 +46,7 @@ class UserRole(models.Model):
         (USER, 'USER'),
         (ADMIN, 'ADMIN')
     ]
-    role = models.CharField(max_length=5, choices=user_option, default=USER, blank=True,null=True)
+    role = models.CharField(max_length=5, choices=user_option, default=USER, blank=True, null=True)
 
     def __str__(self):
         return f'{self.user.username} Role'
@@ -53,8 +54,11 @@ class UserRole(models.Model):
 
 class UploadPdf(models.Model):
     pdf_name = models.CharField(max_length=100, blank=True)
-    pdf_file = models.FileField(upload_to='pdf',blank=True,null=True)
-    zip_file = models.FileField(upload_to='zip_file',blank=True,null=True)
+    pdf_file = models.FileField(upload_to='pdf', blank=True, null=True)
+    zip_file = models.FileField(upload_to='zip_file', blank=True, null=True)
 
     def __str__(self):
         return self.pdf_name
+
+
+

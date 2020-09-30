@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Question, Choice, UserProfileImg, UserRole,UploadPdf
+from .models import Question, Choice, UserProfileImg, UserRole, UploadPdf
 
 
 # Register your models here.
