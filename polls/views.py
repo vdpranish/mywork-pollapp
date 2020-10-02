@@ -45,6 +45,10 @@ class ResultsView(generic.DetailView):
         return Question.objects.filter(pub_date__lte=timezone.now())
 
 
+class SquareForm(generic.TemplateView):
+    template_name = 'square/sqform.html'
+
+
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     print(question)
@@ -194,6 +198,49 @@ def ajax_request(request):
                     all_user = User.objects.all()
                     data['table_view'] = render_to_string('polls/table.html', {'all_user': all_user})
                     return HttpResponse(json.dumps(data), content_type="application/json")
+        elif action == "payment":
+            from square.client import Client
+            import uuid
+            client = Client(
+                access_token='EAAAEKGHC9ln1ADjUHupUnQH3F5yd7OwCrLsc9DLRQxrs2OF1qgHNOTL_NYFycne',
+                environment='sandbox',
+            )
+
+            data['action'] = request.POST.get('action')
+            price = request.POST.get('price')
+            nonce = request.POST.get('nonce')
+            print(f"nonce:{nonce}")
+            idempotency_key = uuid.uuid4().hex[:16]
+            body = {
+                "source_id": nonce,
+                "idempotency_key": idempotency_key,
+                "amount_money": {
+                    "amount": int(price),
+                    "currency": "USD"
+                },
+            }
+            if nonce:
+                print('nonce is found')
+                payment_api = client.payments
+                result = payment_api.create_payment(body)
+                if result.is_success():
+                    print(result.body)
+            else:
+                payment_api = client.payments
+                result = payment_api.create_payment(body)
+                try:
+                    err_code = str(result.errors[0].get("category"))
+                    err_detail = str(result.errors[0].ge("detail"))
+
+                except:
+                    err_code = ""
+                    err_detail = str(result.errors[0].get("detail"))
+                data['status'] = False
+                data['message'] = "Payment Failed: ERROR CODE  {}".format(err_code)
+                data['detail'] = f"{err_detail}"
+                print(result.is_error)
+
+            return HttpResponse(json.dumps(data), content_type="application/json")
 
 
 def pdf_file(request):

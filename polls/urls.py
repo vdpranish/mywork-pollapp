@@ -16,6 +16,7 @@ urlpatterns = [
     path('<int:user_id>/edit/', views.edit, name='edit'),
     path('delete/', views.delete_user, name='delete'),
     path('ajaxaction/', views.ajax_request, name='ajaxaction'),
+    path('square/', views.SquareForm.as_view(), name='square'),
     path('pdf/', views.pdf_file, name='pdf'),
     path('pdf/<int:pdf_id>', views.pdf_view, name='pdfview'),
 ]
