@@ -66,3 +66,8 @@ class PdfFileUpload(forms.ModelForm):
         widgets = {
             'pdf_name': forms.TextInput(attrs={'class': 'form-control'})
         }
+
+
+class SquareCustomer(forms.Form):
+    customer_name = forms.CharField(max_length=254,widget=forms.TextInput(attrs={'class':'form-control'}))
+    customer_email = forms.EmailField(max_length=254,widget=forms.EmailInput(attrs={'class':'form-control'}))

@@ -33,17 +33,30 @@ const paymentForm = new SqPaymentForm({
                console.error('Encountered errors:');
                errors.forEach(function (error) {
                    console.error('  ' + error.message);
-                   document.querySelector('.details-').value = error.message
+                   $('.error-').html(error.message)
                });
-               // alert('Encountered errors, check browser developer console for more details');
-               // success.style.display ="none";
-
                return;
            }
-//              alert(`The generated nonce is:\n${nonce}`);
-              document.getElementById('card-nonce').value = nonce;
-
-               // error.style.display = "none";
+            let csrftoken = $('input[name=csrfmiddlewaretoken]').val()
+            if(nonce){
+            $.ajax({
+                url: '/ajaxaction/',
+                type:"POST",
+                data: {
+                    csrfmiddlewaretoken: csrftoken,
+                    action:"payment",
+                    nonce:nonce,
+                    error:errors
+                },
+                dataType: "json",
+                success: function (data){
+                    console.log(data)
+//                    if(!data.status){
+//                        $('.error-').html(data.message)
+//                    }
+                }
+            });
+            }
            }
        }
      });
@@ -58,36 +71,5 @@ function onGetCardNonce(event) {
        paymentForm.requestCardNonce();
 
      }
-
-
-
-let csrftoken = $('input[name=csrfmiddlewaretoken]').val()
- $('#sq-creditcard').click(function (){
-     const price = $("#amount").val()
-        $.ajax({
-            url: '/ajaxaction/',
-            type:"POST",
-            data: {
-                csrfmiddlewaretoken: csrftoken,
-                action:"payment",
-                nonce:$('#card-nonce').val(),
-                price:price,
-            },
-            dataType: "json",
-            success: function (data){
-                console.log(data)
-                if(!data.status){
-                    $('.error-').html(data.message)
-                     setTimeout(
-                     function(){
-                     $('.error-').html(" ")
-                     }
-                     ,3000);
-
-                }
-            }
-        });
-    }
-    )
 
 

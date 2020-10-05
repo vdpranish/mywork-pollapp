@@ -19,4 +19,5 @@ urlpatterns = [
     path('square/', views.SquareForm.as_view(), name='square'),
     path('pdf/', views.pdf_file, name='pdf'),
     path('pdf/<int:pdf_id>', views.pdf_view, name='pdfview'),
+    path('create_square_customer',views.square_customer_form,name='create_square_customer')
 ]

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <form method="post" id="square_customer_cratetion_form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="button" class="btn btn-primary btn-xl" id="square-customer">Add</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+let csrfToken = $('input[name=csrfmiddlewaretoken]').val()
+ $('#square-customer').click(function(){
+    const formValues = $('#square_customer_cratetion_form').serializeArray();
+    const  formJson = JSON.stringify(formValues)
+    $.ajax({
+            url :'/ajaxaction/',
+            type:"POST",
+            dataType:'json',
+            data:{
+                action:'create_square_customer',
+                csrfmiddlewaretoken:csrfToken,
+                formValues:formJson,
+            }
+        })
+ })
+</script>
+{% endblock %}

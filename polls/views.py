@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views import generic
 from zipfile import ZipFile
-from .forms import CreateUser, LoginUser, ProfileImgForm, UserRoleForm, EditForm, PdfFileUpload
+from .forms import CreateUser, LoginUser, ProfileImgForm, UserRoleForm, EditForm, PdfFileUpload, SquareCustomer
 from .models import Question, Choice, UploadPdf
 
 
@@ -48,6 +48,18 @@ class ResultsView(generic.DetailView):
 class SquareForm(generic.TemplateView):
     template_name = 'square/sqform.html'
 
+
+# class SquareCutomerForm(generic.TemplateView):
+#     template_name = 'square/customer.html'
+#     form_class = SquareCustomer
+
+
+def square_customer_form(request):
+    form = SquareCustomer
+    context = {
+        'form':form
+    }
+    return render(request,'square/customer.html',context)
 
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
@@ -207,19 +219,17 @@ def ajax_request(request):
             )
 
             data['action'] = request.POST.get('action')
-            price = request.POST.get('price')
             nonce = request.POST.get('nonce')
             idempotency_key = uuid.uuid4().hex[:16]
             body = {
                 "source_id": nonce,
                 "idempotency_key": idempotency_key,
                 "amount_money": {
-                    "amount": int(price),
+                    "amount": int('100'),
                     "currency": "USD"
                 },
             }
             if nonce:
-                print('nonce is found')
                 payment_api = client.payments
                 result = payment_api.create_payment(body)
                 if result.is_success():
@@ -227,19 +237,40 @@ def ajax_request(request):
             else:
                 payment_api = client.payments
                 result = payment_api.create_payment(body)
-                try:
-                    err_code = str(result.errors[0].get("category"))
-                    err_detail = str(result.errors[0].ge("detail"))
-
-                except:
-                    err_code = ""
-                    err_detail = str(result.errors[0].get("detail"))
+                # try:
+                #     err_code = str(result.errors[0].get("category"))
+                # except:
+                #     err_code = ""
                 data['status'] = False
-                data['message'] = "Payment Failed: ERROR CODE  {}".format(err_code)
-                data['detail'] = f"{err_detail}"
+                # data['message'] = "Payment Failed: ERROR CODE  {}".format(err_code)
                 print(result.is_error)
-
             return HttpResponse(json.dumps(data), content_type="application/json")
+        elif action == 'create_square_customer':
+            from square.client import Client
+            import uuid
+            client = Client(
+                access_token='EAAAEKGHC9ln1ADjUHupUnQH3F5yd7OwCrLsc9DLRQxrs2OF1qgHNOTL_NYFycne',
+                environment='sandbox',
+            )
+            idempotency_key = uuid.uuid4().hex[:16]
+            form_data = request.POST.get('formValues')
+            json_form = json.loads(form_data)
+            customer_name = json_form[1]['value']
+            customer_email = json_form[2]['value']
+            body = {
+                "idempotency_key": idempotency_key,
+                "given_name": customer_name,
+                "email_address": customer_email
+            }
+            result = client.customers.create_customer(body)
+            form = SquareForm()
+            if result.is_success():
+                print(result.body)
+            elif result.is_error():
+                print(result.errors)
+            print(f"customer_name:{customer_name}, customer_email:{customer_email}")
+            return HttpResponse(json.dumps(data),content_type="application/json")
+
 
 
 def pdf_file(request):
