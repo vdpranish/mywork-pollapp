@@ -1,7 +1,3 @@
-// const success = document.querySelector('#sucess')
-// const error = document.querySelector('#error')
-// error.style.display = "none";
-// success.style.display="none";
 const paymentForm = new SqPaymentForm({
        //TODO: Replace with your sandbox application ID
        applicationId: "sandbox-sq0idb-5pFqf_ZfCIPuS0DfaUlZkQ",
@@ -41,13 +37,11 @@ const paymentForm = new SqPaymentForm({
                });
                // alert('Encountered errors, check browser developer console for more details');
                // success.style.display ="none";
-               // setTimeout(function (){error.style.display = "block"},3000)
 
                return;
            }
-              alert(`The generated nonce is:\n${nonce}`);
+//              alert(`The generated nonce is:\n${nonce}`);
               document.getElementById('card-nonce').value = nonce;
-           // setTimeout( function () {success.style.display ="block"},3000)
 
                // error.style.display = "none";
            }
@@ -55,6 +49,7 @@ const paymentForm = new SqPaymentForm({
      });
 
  paymentForm.build()
+
 
 function onGetCardNonce(event) {
        // Don't submit the form until SqPaymentForm returns with a nonce
@@ -83,7 +78,11 @@ let csrftoken = $('input[name=csrfmiddlewaretoken]').val()
                 console.log(data)
                 if(!data.status){
                     $('.error-').html(data.message)
-                    // $('.details-').html(data.detail)
+                     setTimeout(
+                     function(){
+                     $('.error-').html(" ")
+                     }
+                     ,3000);
 
                 }
             }

@@ -209,7 +209,6 @@ def ajax_request(request):
             data['action'] = request.POST.get('action')
             price = request.POST.get('price')
             nonce = request.POST.get('nonce')
-            print(f"nonce:{nonce}")
             idempotency_key = uuid.uuid4().hex[:16]
             body = {
                 "source_id": nonce,
