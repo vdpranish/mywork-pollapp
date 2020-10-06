@@ -263,7 +263,6 @@ def ajax_request(request):
                 "email_address": customer_email
             }
             result = client.customers.create_customer(body)
-            form = SquareForm()
             if result.is_success():
                 print(result.body)
             elif result.is_error():
